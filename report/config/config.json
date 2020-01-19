@@ -2,7 +2,7 @@
   "development": {
     "username": "sa",
     "password": "P@ssw0rd",
-    "database": "report",
+    "database": "financing",
     "host": "localhost",
     "port" : "1433",
     "dialect": "mssql"
