@@ -14,16 +14,25 @@ module.exports = {
       accountNo: {
         type: Sequelize.INTEGER
       },
+      accountName: {
+        type: Sequelize.STRING
+      },
       installmentNo: {
         type: Sequelize.INTEGER
       },
+      plafon: {
+        type: Sequelize.DOUBLE
+      },
       postedAmount: {
-        type: Sequelize.FLOAT
+        type: Sequelize.DOUBLE
       },
       postedDate: {
         type: Sequelize.DATE
       },
       postedBy: {
+        type: Sequelize.STRING
+      },
+      ket: {
         type: Sequelize.STRING
       },
       createdAt: {

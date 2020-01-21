@@ -65,13 +65,28 @@ const findByPostedBy = async (req,res)=>{
   await model['reports'].findAll({
     where:{
       postedBy:postedby
-    }
+    },
+    attributes:[
+      'trxId',
+      'accountNo',
+      'accountName',
+      'installmentNo',
+      'plafon',
+      'postedAmount',
+      'postedDate',
+      'postedBy',
+      'ket'
+    ]
   }).then(async (report)=> {
     if ( report.length !== 0){
+      let dataResponse = {};
+      for(let idx=0; idx<report.length; idx++){
+        if(!(report[idx].postedBy in dataResponse))
+          dataResponse[report[idx].postedBy] = [];
+        dataResponse[report[idx].postedBy].push(report[idx])
+      }
       res.send({
-        message:{
-          report
-        }
+        dataResponse
       })
     } else {
       res.status(404);
@@ -82,9 +97,86 @@ const findByPostedBy = async (req,res)=>{
   })
 };
 
+const findByPostedByAll = async (req,res)=>{
+  await model['reports'].findAll({
+    attributes:[
+      'trxId',
+      'accountNo',
+      'accountName',
+      'installmentNo',
+      'plafon',
+      'postedAmount',
+      'postedDate',
+      'postedBy',
+      'ket'
+    ]
+  }).then(async (report)=> {
+    if ( report.length !== 0){
+      let dataResponse = {};
+      for(let idx=0; idx<report.length; idx++){
+        if(!(report[idx].postedBy in dataResponse))
+          dataResponse[report[idx].postedBy] = [];
+        dataResponse[report[idx].postedBy].push(report[idx])
+      }
+      res.send({
+        dataResponse
+      })
+    } else {
+      res.status(404);
+      res.send({
+        message:"report not found"
+      })
+    }
+  })
+};
+
+const findByket = async (req,res)=> {
+  let ket = req.params.ket;
+  await model['reports'].findAll({
+    where: {
+      ket: ket
+    },
+    attributes: [
+      'trxId',
+      'accountNo',
+      'accountName',
+      'installmentNo',
+      'plafon',
+      'postedAmount',
+      'postedDate',
+      'postedBy',
+      'ket'
+    ]
+  }).then(async (report)=> {
+    if ( report.length !== 0){
+      let dataResponse = {};
+      for(let idx=0; idx<report.length; idx++){
+        if(!(report[idx].ket in dataResponse))
+          dataResponse[report[idx].ket] = [];
+        dataResponse[report[idx].ket].push(report[idx])
+      }
+      res.send({
+        dataResponse
+      })
+    } else {
+      res.status(404);
+      res.send({
+        message:"report not found"
+      })
+    }
+  })
+};
+
+
+/*const findByMonth = async (req,res)=>{
+
+}*/
+
 module.exports = {
   findAllReport,
   findByTrxId,
   findByAccountNo,
-  findByPostedBy
+  findByPostedBy,
+  findByPostedByAll,
+  findByket
 };
