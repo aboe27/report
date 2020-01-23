@@ -8,9 +8,10 @@ router.post('/insert',report.insertReports);
 
 router.get('/all',reportIn.findAllReport);
 router.get('/trx/:trxId',reportIn.findByTrxId);
-router.get('/acNo/:accountNo',reportIn.findByAccountNo);
-router.get('/postBy/:postedBy',reportIn.findByPostedBy);
-router.get('/postBy',reportIn.findByPostedByAll);
+router.get('/listco/:postedBy',reportIn.listCo);
+router.get('/acno/:accountNo',reportIn.findByAccountNo);
+router.get('/postby/:postedBy',reportIn.findByPostedBy);
+router.get('/postby',reportIn.findByPostedByAll);
 router.get('/ket/:ket',reportIn.findByket);
 
 module.exports = router;

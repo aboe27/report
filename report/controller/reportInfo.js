@@ -1,7 +1,11 @@
 const model = require('../models');
 
 const findAllReport = async (req,res)=>{
-  await model['reports'].findAll().then(function (report) {
+  await model['reports'].findAll({
+    limit: parseInt(req.query.limit),
+    skip: parseInt(req.query.skip)
+  })
+    .then(function (report) {
     res.send(report)
   }).catch(function(err) {
     return (err);
@@ -62,7 +66,7 @@ const findByAccountNo = async (req,res)=>{
 
 const findByPostedBy = async (req,res)=>{
   let postedby = req.params.postedBy;
-  await model['reports'].findAll({
+  await model.reports.findAll({
     where:{
       postedBy:postedby
     },
@@ -167,6 +171,45 @@ const findByket = async (req,res)=> {
   })
 };
 
+const listCo = async (req,res)=>{
+  let postedby = req.params.postedBy
+  let ket = req.params.ket
+  await model['reports'].findAll({
+    where :{
+      postedBy : postedby,
+      ket : 'late'
+    },
+    attributes:[
+      'trxId',
+      'accountNo',
+      'accountName',
+      'installmentNo',
+      'plafon',
+      'postedAmount',
+      'postedDate',
+      'postedBy',
+      'ket'
+    ]
+  }).then(async (report)=> {
+    if ( report.length !== 0){
+      let dataCo = {};
+      for(let idc=0; idc<report.length; idc++){
+        if(!(report[idc].postedBy in dataCo))
+          dataCo[report[idc].postedBy] = [];
+          dataCo[report[idc].postedBy].push(report[idc])
+      }
+      res.send({
+        dataCo
+      })
+    } else {
+      res.status(404);
+      res.send({
+        message:"report not found"
+      })
+    }
+  })
+};
+
 
 /*const findByMonth = async (req,res)=>{
 
@@ -178,5 +221,6 @@ module.exports = {
   findByAccountNo,
   findByPostedBy,
   findByPostedByAll,
-  findByket
+  findByket,
+  listCo
 };

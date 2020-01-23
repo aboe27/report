@@ -8,10 +8,11 @@
     "dialect": "mssql"
   },
   "test": {
-    "username": "root",
-    "password": null,
+    "username": "sa",
+    "password": "P@ssw0rd",
     "database": "database_test",
-    "host": "127.0.0.1",
+    "host": "localhost",
+    "port" : "1433",
     "dialect": "mssql",
     "operatorsAliases": false
   },
