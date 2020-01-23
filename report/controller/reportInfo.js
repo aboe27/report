@@ -69,11 +69,14 @@ const findByAccountNo = async (req,res)=>{
 };
 
 const findByPostedBy = async (req,res)=>{
+  const page = req.query.page
+  const limit = 10
   let postedby = req.params.postedBy;
-  await model.reports.findAll({
+  await model.reports.findAndCountAll({
     where:{
       postedBy:postedby
     },
+    offset: (page*limit)-limit, limit,
     attributes:[
       'trxId',
       'accountNo',
@@ -87,14 +90,9 @@ const findByPostedBy = async (req,res)=>{
     ]
   }).then(async (report)=> {
     if ( report.length !== 0){
-      let dataResponse = {};
-      for(let idx=0; idx<report.length; idx++){
-        if(!(report[idx].postedBy in dataResponse))
-          dataResponse[report[idx].postedBy] = [];
-        dataResponse[report[idx].postedBy].push(report[idx])
-      }
       res.send({
-        dataResponse
+        message:report,
+        totalPage:Math.ceil(report.count/limit)
       })
     } else {
       res.status(404);
@@ -139,11 +137,14 @@ const findByPostedByAll = async (req,res)=>{
 };
 
 const findByket = async (req,res)=> {
+  const page = req.query.page
+  const limit = 10
   let ket = req.params.ket;
-  await model['reports'].findAll({
+  await model['reports'].findAndCountAll({
     where: {
       ket: ket
     },
+    offset: (page*limit)-limit, limit,
     attributes: [
       'trxId',
       'accountNo',
@@ -157,14 +158,9 @@ const findByket = async (req,res)=> {
     ]
   }).then(async (report)=> {
     if ( report.length !== 0){
-      let dataResponse = {};
-      for(let idx=0; idx<report.length; idx++){
-        if(!(report[idx].ket in dataResponse))
-          dataResponse[report[idx].ket] = [];
-        dataResponse[report[idx].ket].push(report[idx])
-      }
       res.send({
-        dataResponse
+        message:report,
+        totalPage:Math.ceil(report.count/limit)
       })
     } else {
       res.status(404);
@@ -176,12 +172,15 @@ const findByket = async (req,res)=> {
 };
 
 const listCo = async (req,res)=>{
+  const page = req.query.page
+  const limit = 10
   let postedby = req.params.postedBy
-  await model['reports'].findAll({
+  await model['reports'].findAndCountAll({
     where :{
       postedBy : postedby,
-      ket : 'late'
+      ket : 'ontime'
     },
+    offset: (page*limit)-limit, limit,
     attributes:[
       'trxId',
       'accountNo',
@@ -196,7 +195,8 @@ const listCo = async (req,res)=>{
   }).then(async (report)=> {
     if ( report.length !== 0){
       res.send({
-        report
+        message:report,
+        totalPage:Math.ceil(report.count/limit)
       })
     } else {
       res.status(404);
