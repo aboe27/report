@@ -1,12 +1,16 @@
 const model = require('../models');
 
 const findAllReport = async (req,res)=>{
-  await model['reports'].findAll({
-    limit: parseInt(req.query.limit),
-    skip: parseInt(req.query.skip)
-  })
+  const page = req.query.page
+  const limit = 10
+  await model['reports'].findAndCountAll(
+    { offset: (page*limit)-limit, limit},
+  )
     .then(function (report) {
-    res.send(report)
+        res.send({
+          message:report,
+          totalPage:Math.ceil(report.count/limit)
+        })
   }).catch(function(err) {
     return (err);
   });
@@ -173,7 +177,6 @@ const findByket = async (req,res)=> {
 
 const listCo = async (req,res)=>{
   let postedby = req.params.postedBy
-  let ket = req.params.ket
   await model['reports'].findAll({
     where :{
       postedBy : postedby,
@@ -192,14 +195,8 @@ const listCo = async (req,res)=>{
     ]
   }).then(async (report)=> {
     if ( report.length !== 0){
-      let dataCo = {};
-      for(let idc=0; idc<report.length; idc++){
-        if(!(report[idc].postedBy in dataCo))
-          dataCo[report[idc].postedBy] = [];
-          dataCo[report[idc].postedBy].push(report[idc])
-      }
       res.send({
-        dataCo
+        report
       })
     } else {
       res.status(404);
