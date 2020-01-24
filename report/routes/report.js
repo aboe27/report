@@ -13,5 +13,6 @@ router.get('/acno/:accountNo',reportIn.findByAccountNo);
 router.get('/postby/:postedBy',reportIn.findByPostedBy);
 router.get('/postby',reportIn.findByPostedByAll);
 router.get('/ket/:ket',reportIn.findByket);
+router.get('/customers/:postedBy',reportIn.listNasabahByCo);
 
 module.exports = router;

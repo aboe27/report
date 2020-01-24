@@ -1,8 +1,9 @@
 const model = require('../models');
 
+//SEMUA REPORT//
 const findAllReport = async (req,res)=>{
-  const page = req.query.page
-  const limit = 10
+  const page = req.query.page;
+  const limit = 10;
   await model['reports'].findAndCountAll(
     { offset: (page*limit)-limit, limit},
   )
@@ -16,61 +17,44 @@ const findAllReport = async (req,res)=>{
   });
 };
 
-const findByTrxId = async (req,res,next)=>{
-  let trxId = req.params.trxId;
-  await model['reports'].findOne({
-    where:{
-      trxId : trxId
-    }
-  }).then(async (report)=>{
-    try {
-      if (report.length !== 0){
-        res.send({
-          message:{
-            report
-          }
-        })
-      } else {
-        next();
-      }
-    }catch{
-      res.status(404);
-      res.send({
-        message: "report not found"
-      })
-    }
-  })
-};
-
-const findByAccountNo = async (req,res)=>{
-  let accountno = req.params.accountNo;
+//LIST NASABAH BERDASARKAN CO//
+const listNasabahByCo = async (req, res) =>{
+  let postedBy = req.params.postedBy;
   await model['reports'].findAll({
-    where:{
-      accountNo:accountno
-    }
+    where :{
+      postedBy : postedBy
+    },
+    attributes:[
+      'accountNo',
+      'accountName',
+      'postedBy'
+    ]
   }).then(async (report)=> {
     if ( report.length !== 0){
-      res.send({
-        message:{
-          report
+      let result = [];
+      let currentAccountName;
+      for (let i=0; i<report.length;i++){
+        if (report[i].accountName !== currentAccountName){
+          result.push(report[i]);
+          currentAccountName = report[i].accountName;
         }
+      }
+      res.send({
+        message:result,
       })
     } else {
       res.status(404);
       res.send({
-        message:"not found"
+        message:"report not found"
       })
     }
-  }).catch(()=>{
-    res.status(400).json({
-      message:"bad request"
-    })
   })
 };
 
+//LAPORAN TRANSAKSI BERDASARKAN CO//
 const findByPostedBy = async (req,res)=>{
-  const page = req.query.page
-  const limit = 10
+  const page = req.query.page;
+  const limit = 10;
   let postedby = req.params.postedBy;
   await model.reports.findAndCountAll({
     where:{
@@ -103,6 +87,135 @@ const findByPostedBy = async (req,res)=>{
   })
 };
 
+//SEMUA PEMBAYARAN YANG TERLAMBAT//
+const findByket = async (req,res)=> {
+  const page = req.query.page;
+  const limit = 10;
+  let ket = req.params.ket;
+  await model['reports'].findAndCountAll({
+    where: {
+      ket: ket
+    },
+    offset: (page*limit)-limit, limit,
+    attributes: [
+      'trxId',
+      'accountNo',
+      'accountName',
+      'installmentNo',
+      'plafon',
+      'postedAmount',
+      'postedDate',
+      'postedBy',
+      'ket'
+    ]
+  }).then(async (report)=> {
+    if ( report.length !== 0){
+      res.send({
+        message:report,
+        totalPage:Math.ceil(report.count/limit)
+      })
+    } else {
+      res.status(404);
+      res.send({
+        message:"report not found"
+      })
+    }
+  })
+};
+
+//PEMBAYARAN YANG TERLAMBAT BERDASARKAN CO//
+const listCo = async (req,res)=>{
+  const page = req.query.page;
+  const limit = 10;
+  let postedby = req.params.postedBy;
+  await model['reports'].findAndCountAll({
+    where :{
+      postedBy : postedby,
+      ket : 'ontime'
+    },
+    offset: (page*limit)-limit, limit,
+    attributes:[
+      'trxId',
+      'accountNo',
+      'accountName',
+      'installmentNo',
+      'plafon',
+      'postedAmount',
+      'postedDate',
+      'postedBy',
+      'ket'
+    ]
+  }).then(async (report)=> {
+    if ( report.length !== 0){
+      res.send({
+        message:report,
+        totalPage:Math.ceil(report.count/limit)
+      })
+    } else {
+      res.status(404);
+      res.send({
+        message:"report not found"
+      })
+    }
+  })
+};
+
+//MENCARI BERDASARKAN NOMOR TRANSAKSI//
+const findByTrxId = async (req,res,next)=>{
+  let trxId = req.params.trxId;
+  await model['reports'].findOne({
+    where:{
+      trxId : trxId
+    }
+  }).then(async (report)=>{
+    try {
+      if (report.length !== 0){
+        res.send({
+          message:{
+            report
+          }
+        })
+      } else {
+        next();
+      }
+    }catch{
+      res.status(404);
+      res.send({
+        message: "report not found"
+      })
+    }
+  })
+};
+
+//MENCARI TRANSAKSI BERDASARKAN NOMOR ACCOUNT//
+const findByAccountNo = async (req,res)=>{
+  let accountno = req.params.accountNo;
+  await model['reports'].findAll({
+    where:{
+      accountNo:accountno
+    }
+  }).then(async (report)=> {
+    if ( report.length !== 0){
+      res.send({
+        message:{
+          report
+        }
+      })
+    } else {
+      res.status(404);
+      res.send({
+        message:"not found"
+      })
+    }
+  }).catch(()=>{
+    res.status(400).json({
+      message:"bad request"
+    })
+  })
+};
+
+
+//SEMUA TRANSAKSI DIURUTKAN BERDASARKAN CO//
 const findByPostedByAll = async (req,res)=>{
   await model['reports'].findAll({
     attributes:[
@@ -136,82 +249,6 @@ const findByPostedByAll = async (req,res)=>{
   })
 };
 
-const findByket = async (req,res)=> {
-  const page = req.query.page
-  const limit = 10
-  let ket = req.params.ket;
-  await model['reports'].findAndCountAll({
-    where: {
-      ket: ket
-    },
-    offset: (page*limit)-limit, limit,
-    attributes: [
-      'trxId',
-      'accountNo',
-      'accountName',
-      'installmentNo',
-      'plafon',
-      'postedAmount',
-      'postedDate',
-      'postedBy',
-      'ket'
-    ]
-  }).then(async (report)=> {
-    if ( report.length !== 0){
-      res.send({
-        message:report,
-        totalPage:Math.ceil(report.count/limit)
-      })
-    } else {
-      res.status(404);
-      res.send({
-        message:"report not found"
-      })
-    }
-  })
-};
-
-const listCo = async (req,res)=>{
-  const page = req.query.page
-  const limit = 10
-  let postedby = req.params.postedBy
-  await model['reports'].findAndCountAll({
-    where :{
-      postedBy : postedby,
-      ket : 'ontime'
-    },
-    offset: (page*limit)-limit, limit,
-    attributes:[
-      'trxId',
-      'accountNo',
-      'accountName',
-      'installmentNo',
-      'plafon',
-      'postedAmount',
-      'postedDate',
-      'postedBy',
-      'ket'
-    ]
-  }).then(async (report)=> {
-    if ( report.length !== 0){
-      res.send({
-        message:report,
-        totalPage:Math.ceil(report.count/limit)
-      })
-    } else {
-      res.status(404);
-      res.send({
-        message:"report not found"
-      })
-    }
-  })
-};
-
-
-/*const findByMonth = async (req,res)=>{
-
-}*/
-
 module.exports = {
   findAllReport,
   findByTrxId,
@@ -219,5 +256,6 @@ module.exports = {
   findByPostedBy,
   findByPostedByAll,
   findByket,
-  listCo
+  listCo,
+  listNasabahByCo
 };
