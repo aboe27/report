@@ -4,9 +4,10 @@ const model = require('../models');
 const findAllReport = async (req,res)=>{
   const page = req.query.page;
   const limit = 10;
-  await model['reports'].findAndCountAll(
-    { offset: (page*limit)-limit, limit},
-  )
+  await model['reports'].findAndCountAll({
+      offset: (page*limit)-limit,
+      limit
+    })
     .then(function (report) {
         res.send({
           message:report,
