@@ -8,7 +8,7 @@ exports.insertReports = async(req, res) =>{
       res.status(200).json({
         status: 'ok',
         data:report
-      })
+    })
     })
   }catch (err) {
     res.status(400).json({

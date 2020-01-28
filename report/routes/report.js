@@ -9,6 +9,7 @@ router.post('/insert',report.insertReports);
 router.get('/all',reportIn.findAllReport);
 router.get('/postby/:postedBy',reportIn.findByPostedBy);
 router.get('/ket/:ket',reportIn.findByket);
+
 /*router.get('/trx/:trxId',reportIn.findByTrxId);
 router.get('/listco/:postedBy',reportIn.listCo);
 router.get('/acno/:accountNo',reportIn.findByAccountNo);
